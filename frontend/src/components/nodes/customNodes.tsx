@@ -48,7 +48,7 @@ export const CustomNode = ({ data, isConnectable }: CustomNodeProps) => {
         type="target"
         position={Position.Left}
         isConnectable={isConnectable}
-        className="w-3 h-3 bg-primary border-2 border-background !left-[-6px]"
+        style={{ background: 'transparent', width: '14px', height: '14px', left: '-12px' }}
       />
 
       <div className="relative min-w-[200px] bg-card border border-border rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden glow-node group-hover:glow-hover">
@@ -105,7 +105,7 @@ export const CustomNode = ({ data, isConnectable }: CustomNodeProps) => {
         type="source"
         position={Position.Right}
         isConnectable={isConnectable}
-        className="w-3 h-3 bg-primary border-2 border-background !right-[-6px]"
+        style={{ background: 'transparent', width: '14px', height: '14px', right: '-12px' }}
       />
 
       <motion.div

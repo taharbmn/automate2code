@@ -23,9 +23,11 @@ const nodeTypes = {
 interface FlowCanvasProps {
   nodes: Node[];
   setNodes: Dispatch<SetStateAction<Node[]>>;
+  selectedNode?: Node | null;
+  onNodeSelect?: (node: Node | null) => void;
 }
 
-export const FlowCanvas = ({ nodes: externalNodes, setNodes: setExternalNodes }: FlowCanvasProps) => {
+export const FlowCanvas = ({ nodes: externalNodes, setNodes: setExternalNodes, selectedNode, onNodeSelect }: FlowCanvasProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -34,6 +36,17 @@ export const FlowCanvas = ({ nodes: externalNodes, setNodes: setExternalNodes }:
     (params: Connection | Edge) => setEdges((eds: Edge[]) => addEdge(params, eds)),
     [setEdges]
   );
+
+  const onNodeClick = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      onNodeSelect?.(node);
+    },
+    [onNodeSelect]
+  );
+
+  const onPaneClick = useCallback(() => {
+    onNodeSelect?.(null);
+  }, [onNodeSelect]);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -100,31 +113,13 @@ export const FlowCanvas = ({ nodes: externalNodes, setNodes: setExternalNodes }:
           onConnect={onConnect}
           onDrop={onDrop}
           onDragOver={onDragOver}
+          onNodeClick={onNodeClick}
+          onPaneClick={onPaneClick}
           nodeTypes={nodeTypes}
           fitView
           attributionPosition="bottom-left"
           className="bg-canvas"
         >
-          {/* <Controls 
-            className="bg-surface border border-border rounded-lg shadow-lg"
-            showInteractive={false}
-          /> */}
-          
-          {/* <MiniMap 
-            className="bg-surface border border-border rounded-lg"
-            nodeColor={(node) => {
-              const colors = {
-                http: '#6366f1',
-                transform: '#f59e0b',
-                conditional: '#10b981',
-                output: '#ec4899'
-              };
-              return colors[node.data?.nodeType as keyof typeof colors] || '#64748b';
-            }}
-            pannable
-            zoomable
-          />
-           */}
           <Background 
             variant={BackgroundVariant.Dots}
             gap={20}

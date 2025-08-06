@@ -2,39 +2,38 @@
 import React, { useState } from 'react';
 import Header from '@/components/workflow/Header';
 import { NodePalette } from '@/components/workflow/NodePalette';
-import { CodePanel } from '@/components/workflow/CodePanle';
+import { Sidebar } from '@/components/workflow/Sidebar';
 import { FlowCanvas } from '@/components/workflow/FlowCanvas';
 import { Node } from '@xyflow/react';
 
 export default function Page() {
-  const [selectedLanguage, setSelectedLanguage] = useState<'javascript' | 'python'>('javascript');
   const [nodes, setNodes] = useState<Node[]>([]);
-  const [isCodePanelVisible, setIsCodePanelVisible] = useState(true);
+  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
 
   return (
     <div className=" h-screen flex flex-col">
       <Header
-        selectedLanguage={selectedLanguage}
-        onLanguageChange={setSelectedLanguage}
-        isCodePanelVisible={isCodePanelVisible}
-        onToggleCodePanel={() => setIsCodePanelVisible(!isCodePanelVisible)}
+
       />
 
       <div className="flex-1 flex overflow-hidden">
         <NodePalette />
 
         <div className="flex-1 relative">
-          <FlowCanvas nodes={nodes} setNodes={setNodes} />
+          <FlowCanvas 
+            nodes={nodes} 
+            setNodes={setNodes}
+            selectedNode={selectedNode}
+            onNodeSelect={setSelectedNode}
+          />
         </div>
 
-        {isCodePanelVisible && (
           <div className=" w-[25vw] border-l border-border bg-surface">
-            <CodePanel
-              language={selectedLanguage}
+            <Sidebar
               nodes={nodes}
+              selectedNode={selectedNode}
             />
           </div>
-        )}
       </div>
     </div>
   );
