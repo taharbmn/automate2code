@@ -127,7 +127,7 @@ We're building the future of AI development education and automation. Join us!
 ---
 
 ## Community 
-Join us in discord and follow us on GitHub to stay updated, share your ideas, and connect with other AI enthusiasts!
+Join us in [discord](https://discord.com/invite/cWfmT7ju) and follow us on GitHub to stay updated, share your ideas, and connect with other AI enthusiasts!
 
 **Ready to transform your AI ideas into reality?** 🚀
 
