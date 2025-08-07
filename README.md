@@ -83,10 +83,8 @@ automate2code is the bridge between **no-code simplicity** and **full-code power
 
 ## 🌍 **Deploy Anywhere**
 
-- ☁️ **Cloud Platforms**: AWS, Google Cloud, Azure, DigitalOcean
-- 🐳 **Container Platforms**: Docker, Kubernetes, Docker Compose
-- 💻 **Local Development**: Your laptop, Raspberry Pi, anywhere Docker runs
-- 🚀 **Edge Computing**: Deploy AI at the edge with minimal setup
+- ☁️ **Cloud Platforms**: AWS, Google Cloud, Azure
+- 💻 **Local Development**: Your laptop, anywhere Docker runs
 
 ---
 
