@@ -129,7 +129,7 @@ export const AiNode = ({ data, isConnectable, selected }: AiNodeProps) => {
 
       {isAiAgent && (
         <div className="absolute min-w-[180px] -bottom-10 left-1/2 -translate-x-1/2 flex justify-between items-center px-4 pointer-events-none z-10">
-          {aiAgentHandles.map((handle, index) => (
+          {aiAgentHandles.map((handle) => (
             <div key={handle.id} className="flex flex-col items-center justify-center relative">
               <span className=" text-xs text-muted-foreground mb-4 mt-1">{handle.label}</span>
               <Handle

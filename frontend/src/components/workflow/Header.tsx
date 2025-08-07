@@ -1,11 +1,8 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Code2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 
-interface HeaderProps {}
 
 export const Header = () => {
   return (

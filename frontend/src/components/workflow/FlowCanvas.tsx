@@ -31,13 +31,11 @@ const nodeTypes = {
 };
 
 interface FlowCanvasProps {
-  nodes: Node[];
   setNodes: Dispatch<SetStateAction<Node[]>>;
-  selectedNode?: Node | null;
   onNodeSelect?: (node: Node | null) => void;
 }
 
-export const FlowCanvas = ({ nodes: externalNodes, setNodes: setExternalNodes, selectedNode, onNodeSelect }: FlowCanvasProps) => {
+export const FlowCanvas = ({ setNodes: setExternalNodes, onNodeSelect }: FlowCanvasProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
