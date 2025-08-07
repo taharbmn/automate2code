@@ -37,7 +37,6 @@ export const Header = () => {
           <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
             Automate2Code
           </h1>
-          <p className="text-xs text-muted-foreground">Visual Automation to Code</p>
         </div>
       </motion.div>
 

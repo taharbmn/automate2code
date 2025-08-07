@@ -26,9 +26,33 @@ import {
   AlertCircle,
   Copy,
   Download,
+  Bot,
+  Brain,
+  MessageSquare,
+  Mail,
+  Database,
+  Link,
+  Sheet,
+  HardDrive,
+  FolderOpen,
+  GitBranch,
+  Shuffle,
+  RotateCcw,
+  Pause,
+  GitMerge,
+  List,
+  Send,
+  Zap,
+  Webhook,
+  FileText,
 } from "lucide-react";
 import { Node } from "@xyflow/react";
 import MonacoEditor from "@monaco-editor/react";
+
+
+interface PropertiesTabProps {
+  selectedNode?: Node | null;
+}
 
 interface SidebarProps {
   nodes: Node[];
@@ -125,116 +149,7 @@ if __name__ == "__main__":
     workflow()`;
   };
 
-  const renderPropertiesTab = () => {
-    if (!selectedNode) {
-      return (
-        <div className="p-6 text-center">
-          <div className="rounded-full bg-surface/50 w-16 h-16 flex items-center justify-center mx-auto mb-4">
-            <Settings className="w-8 h-8 text-muted-foreground" />
-          </div>
-          <h3 className="font-medium text-foreground mb-2">No Node Selected</h3>
-          <p className="text-sm text-muted-foreground">
-            Select a node on the canvas to configure its properties
-          </p>
-        </div>
-      );
-    }
 
-    const nodeType = selectedNode.data?.nodeType;
-
-    return (
-      <div className="p-6 space-y-6">
-
-        {nodeType === "http" && (
-          <div className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="api-endpoint">API Endpoint</Label>
-              <Input
-                id="api-endpoint"
-                type="text"
-                placeholder="https://api.example.com/data"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="http-method">HTTP Method</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select method" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="GET">GET</SelectItem>
-                  <SelectItem value="POST">POST</SelectItem>
-                  <SelectItem value="PUT">PUT</SelectItem>
-                  <SelectItem value="DELETE">DELETE</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="api-key" className="flex items-center gap-2">
-                <Key className="w-4 h-4" />
-                Authentication
-              </Label>
-              <div className="relative">
-                <Input
-                  id="api-key"
-                  type="password"
-                  placeholder="Enter your API key"
-                  className="pr-12"
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
-                >
-                  <EyeOff className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="headers">Request Headers</Label>
-              <Textarea
-                id="headers"
-                placeholder="Content-Type: application/json&#10;Accept: application/json"
-                className="h-24 font-mono text-sm"
-              />
-            </div>
-          </div>
-        )}
-
-        {nodeType === "transform" && (
-          <div className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="transform-script">Transformation Script</Label>
-              <Textarea
-                id="transform-script"
-                placeholder="data.map(item => ({ ...item, processed: true }))"
-                className="h-32 font-mono text-sm"
-              />
-            </div>
-          </div>
-        )}
-
-        {nodeType === "conditional" && (
-          <div className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="condition">Condition Expression</Label>
-              <Input
-                id="condition"
-                type="text"
-                placeholder="data.length > 0"
-                className="font-mono text-sm"
-              />
-            </div>
-          </div>
-        )}
-
-        <Button className="w-full py-3 font-medium">Save Configuration</Button>
-      </div>
-    );
-  };
 
   const renderExecutionTab = () => {
     return (
@@ -457,20 +372,7 @@ if __name__ == "__main__":
     );
   };
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "properties":
-        return renderPropertiesTab();
-      case "execution":
-        return renderExecutionTab();
-      case "code":
-        return renderCodeTab();
-      case "settings":
-        return renderSettingsTab();
-      default:
-        return renderCodeTab();
-    }
-  };
+
 
   return (
     <div className="w-full h-full flex flex-col bg-surface border-l border-border">
@@ -525,10 +427,1748 @@ if __name__ == "__main__":
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="h-full overflow-y-auto"
           >
-            {renderTabContent()}
+            <PropertiesTab selectedNode={selectedNode} />
           </motion.div>
         </AnimatePresence>
       </div>
+    </div>
+  );
+};
+
+
+const PropertiesTab = ({ selectedNode }: PropertiesTabProps) => {
+  if (!selectedNode) {
+    return (
+      <div className="p-6 text-center">
+        <div className="rounded-full bg-surface/50 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+          <Settings className="w-8 h-8 text-muted-foreground" />
+        </div>
+        <h3 className="font-medium text-foreground mb-2">No Node Selected</h3>
+        <p className="text-sm text-muted-foreground">
+          Select a node on the canvas to configure its properties
+        </p>
+      </div>
+    );
+  }
+
+  const nodeType = selectedNode.data?.nodeType as string;
+  
+  return (
+    <div className="p-6 space-y-6">
+      <h2 className="text-lg font-semibold">Node Properties {nodeType}</h2>
+      {/* TRIGGERS */}
+      {nodeType === "webhook" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Webhook className="w-5 h-5" />
+            <h3 className="font-semibold">Webhook Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="webhook-url">Webhook URL</Label>
+            <Input
+              id="webhook-url"
+              type="text"
+              placeholder="https://your-workflow.com/webhook/abc123"
+              className="font-mono text-sm"
+              readOnly
+            />
+            <p className="text-xs text-muted-foreground">This URL will be generated automatically</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="webhook-method">HTTP Method</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select method" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="GET">GET</SelectItem>
+                <SelectItem value="POST">POST</SelectItem>
+                <SelectItem value="PUT">PUT</SelectItem>
+                <SelectItem value="DELETE">DELETE</SelectItem>
+                <SelectItem value="PATCH">PATCH</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="webhook-auth">Authentication</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select authentication type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None</SelectItem>
+                <SelectItem value="basic">Basic Auth</SelectItem>
+                <SelectItem value="bearer">Bearer Token</SelectItem>
+                <SelectItem value="header">Header Auth</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {nodeType === "schedule" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Clock className="w-5 h-5" />
+            <h3 className="font-semibold">Schedule Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="schedule-type">Schedule Type</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select schedule type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="interval">Interval</SelectItem>
+                <SelectItem value="cron">Cron Expression</SelectItem>
+                <SelectItem value="daily">Daily</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="schedule-value">Schedule Value</Label>
+            <Input
+              id="schedule-value"
+              type="text"
+              placeholder="0 */5 * * * (every 5 minutes)"
+              className="font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="timezone">Timezone</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select timezone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="UTC">UTC</SelectItem>
+                <SelectItem value="America/New_York">America/New_York</SelectItem>
+                <SelectItem value="Europe/London">Europe/London</SelectItem>
+                <SelectItem value="Asia/Tokyo">Asia/Tokyo</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {nodeType === "email-trigger" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Mail className="w-5 h-5" />
+            <h3 className="font-semibold">Email Trigger Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label>Email Provider</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select email provider" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gmail">Gmail</SelectItem>
+                <SelectItem value="outlook">Outlook</SelectItem>
+                <SelectItem value="imap">IMAP</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button className="w-full" variant="outline">
+            <Link className="w-4 h-4 mr-2" />
+            Connect Email Account
+          </Button>
+
+          <div className="space-y-2">
+            <Label htmlFor="email-filter">Email Filter</Label>
+            <Input
+              id="email-filter"
+              type="text"
+              placeholder="from:sender@example.com subject:urgent"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="poll-interval">Poll Interval (minutes)</Label>
+            <Input
+              id="poll-interval"
+              type="number"
+              placeholder="5"
+              min="1"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* DATA SOURCES */}
+      {nodeType === "http" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Link className="w-5 h-5" />
+            <h3 className="font-semibold">HTTP Request Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="api-endpoint">API Endpoint</Label>
+            <Input
+              id="api-endpoint"
+              type="text"
+              placeholder="https://api.example.com/data"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="http-method">HTTP Method</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select method" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="GET">GET</SelectItem>
+                <SelectItem value="POST">POST</SelectItem>
+                <SelectItem value="PUT">PUT</SelectItem>
+                <SelectItem value="DELETE">DELETE</SelectItem>
+                <SelectItem value="PATCH">PATCH</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Authentication</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select authentication type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None</SelectItem>
+                <SelectItem value="basic">Basic Auth</SelectItem>
+                <SelectItem value="bearer">Bearer Token</SelectItem>
+                <SelectItem value="oauth2">OAuth2</SelectItem>
+                <SelectItem value="api-key">API Key</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="api-key" className="flex items-center gap-2">
+              <Key className="w-4 h-4" />
+              API Key / Token
+            </Label>
+            <div className="relative">
+              <Input
+                id="api-key"
+                type="password"
+                placeholder="Enter your API key"
+                className="pr-12"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
+              >
+                <EyeOff className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="headers">Request Headers</Label>
+            <Textarea
+              id="headers"
+              placeholder="Content-Type: application/json&#10;Accept: application/json"
+              className="h-24 font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="body">Request Body</Label>
+            <Textarea
+              id="body"
+              placeholder='{"key": "value"}'
+              className="h-32 font-mono text-sm"
+            />
+          </div>
+        </div>
+      )}
+
+      {nodeType === "mysql" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Database className="w-5 h-5" />
+            <h3 className="font-semibold">MySQL Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="mysql-host">Host</Label>
+            <Input
+              id="mysql-host"
+              type="text"
+              placeholder="localhost"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="mysql-port">Port</Label>
+            <Input
+              id="mysql-port"
+              type="number"
+              placeholder="3306"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="mysql-database">Database</Label>
+            <Input
+              id="mysql-database"
+              type="text"
+              placeholder="my_database"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="mysql-username">Username</Label>
+            <Input
+              id="mysql-username"
+              type="text"
+              placeholder="username"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="mysql-password">Password</Label>
+            <div className="relative">
+              <Input
+                id="mysql-password"
+                type="password"
+                placeholder="password"
+                className="pr-12"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
+              >
+                <EyeOff className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="mysql-operation">Operation</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select operation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="select">Select</SelectItem>
+                <SelectItem value="insert">Insert</SelectItem>
+                <SelectItem value="update">Update</SelectItem>
+                <SelectItem value="delete">Delete</SelectItem>
+                <SelectItem value="custom">Custom Query</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="mysql-query">SQL Query</Label>
+            <Textarea
+              id="mysql-query"
+              placeholder="SELECT * FROM users WHERE active = 1"
+              className="h-32 font-mono text-sm"
+            />
+          </div>
+
+          <Button variant="outline" className="w-full">
+            Test Connection
+          </Button>
+        </div>
+      )}
+
+      {nodeType === "google-sheets" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Sheet className="w-5 h-5" />
+            <h3 className="font-semibold">Google Sheets Configuration</h3>
+          </div>
+          
+          <Button className="w-full" variant="outline">
+            <Link className="w-4 h-4 mr-2" />
+            Connect Google Account
+          </Button>
+
+          <div className="space-y-2">
+            <Label htmlFor="spreadsheet-id">Spreadsheet ID</Label>
+            <Input
+              id="spreadsheet-id"
+              type="text"
+              placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+              className="font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="sheet-name">Sheet Name</Label>
+            <Input
+              id="sheet-name"
+              type="text"
+              placeholder="Sheet1"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="sheets-operation">Operation</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select operation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="read">Read</SelectItem>
+                <SelectItem value="append">Append</SelectItem>
+                <SelectItem value="update">Update</SelectItem>
+                <SelectItem value="clear">Clear</SelectItem>
+                <SelectItem value="create">Create Sheet</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="range">Range</Label>
+            <Input
+              id="range"
+              type="text"
+              placeholder="A1:Z1000"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="value-input-option">Value Input Option</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select input option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="RAW">Raw</SelectItem>
+                <SelectItem value="USER_ENTERED">User Entered</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {nodeType === "airtable" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <HardDrive className="w-5 h-5" />
+            <h3 className="font-semibold">Airtable Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="airtable-api-key">API Key</Label>
+            <div className="relative">
+              <Input
+                id="airtable-api-key"
+                type="password"
+                placeholder="Enter Airtable API key"
+                className="pr-12"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
+              >
+                <EyeOff className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="base-id">Base ID</Label>
+            <Input
+              id="base-id"
+              type="text"
+              placeholder="appXXXXXXXXXXXXXX"
+              className="font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="table-name">Table Name</Label>
+            <Input
+              id="table-name"
+              type="text"
+              placeholder="Table 1"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="airtable-operation">Operation</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select operation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="list">List Records</SelectItem>
+                <SelectItem value="get">Get Record</SelectItem>
+                <SelectItem value="create">Create Record</SelectItem>
+                <SelectItem value="update">Update Record</SelectItem>
+                <SelectItem value="delete">Delete Record</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="max-records">Max Records</Label>
+            <Input
+              id="max-records"
+              type="number"
+              placeholder="100"
+              min="1"
+              max="100"
+            />
+          </div>
+        </div>
+      )}
+
+      {nodeType === "google-drive" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <FolderOpen className="w-5 h-5" />
+            <h3 className="font-semibold">Google Drive Configuration</h3>
+          </div>
+          
+          <Button className="w-full" variant="outline">
+            <Link className="w-4 h-4 mr-2" />
+            Connect Google Account
+          </Button>
+
+          <div className="space-y-2">
+            <Label htmlFor="drive-operation">Operation</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select operation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="list">List Files</SelectItem>
+                <SelectItem value="download">Download File</SelectItem>
+                <SelectItem value="upload">Upload File</SelectItem>
+                <SelectItem value="create-folder">Create Folder</SelectItem>
+                <SelectItem value="delete">Delete</SelectItem>
+                <SelectItem value="share">Share File</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="folder-id">Folder ID (optional)</Label>
+            <Input
+              id="folder-id"
+              type="text"
+              placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+              className="font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="file-filter">File Filter</Label>
+            <Input
+              id="file-filter"
+              type="text"
+              placeholder="name contains 'report'"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="max-files">Max Files</Label>
+            <Input
+              id="max-files"
+              type="number"
+              placeholder="50"
+              min="1"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* LOGIC & FLOW */}
+      {nodeType === "if" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <GitBranch className="w-5 h-5" />
+            <h3 className="font-semibold">If Condition Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="condition-type">Condition Type</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select condition type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="expression">Expression</SelectItem>
+                <SelectItem value="simple">Simple Comparison</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="condition-expression">Condition Expression</Label>
+            <Textarea
+              id="condition-expression"
+              placeholder="{{$json.status}} === 'active' && {{$json.count}} > 10"
+              className="h-24 font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="fallback-output">Fallback Output</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select fallback" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="empty">Empty</SelectItem>
+                <SelectItem value="input">Pass Input</SelectItem>
+                <SelectItem value="custom">Custom Value</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {nodeType === "switch" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Shuffle className="w-5 h-5" />
+            <h3 className="font-semibold">Switch Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="switch-mode">Mode</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select mode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="expression">Expression</SelectItem>
+                <SelectItem value="rules">Rules</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="switch-expression">Switch Expression</Label>
+            <Input
+              id="switch-expression"
+              type="text"
+              placeholder="{{$json.type}}"
+              className="font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <Label>Routes</Label>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Input placeholder="Route 0: user" className="flex-1" />
+                <Button variant="outline" size="sm">Add</Button>
+              </div>
+              <div className="flex gap-2">
+                <Input placeholder="Route 1: admin" className="flex-1" />
+                <Button variant="outline" size="sm">Remove</Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="fallback-output">Fallback Output</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select fallback" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="empty">Empty</SelectItem>
+                <SelectItem value="input">Pass Input</SelectItem>
+                <SelectItem value="custom">Custom Value</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {nodeType === "loop" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <RotateCcw className="w-5 h-5" />
+            <h3 className="font-semibold">Loop Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="loop-input">Input Data</Label>
+            <Input
+              id="loop-input"
+              type="text"
+              placeholder="{{$json.items}}"
+              className="font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="batch-size">Batch Size</Label>
+            <Input
+              id="batch-size"
+              type="number"
+              placeholder="1"
+              min="1"
+            />
+          </div>
+        </div>
+      )}
+
+      {nodeType === "wait" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Pause className="w-5 h-5" />
+            <h3 className="font-semibold">Wait Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="wait-type">Wait Type</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select wait type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="time">Fixed Time</SelectItem>
+                <SelectItem value="webhook">Webhook</SelectItem>
+                <SelectItem value="condition">Until Condition</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="wait-amount">Wait Amount</Label>
+            <Input
+              id="wait-amount"
+              type="number"
+              placeholder="5"
+              min="1"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="wait-unit">Time Unit</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select unit" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="seconds">Seconds</SelectItem>
+                <SelectItem value="minutes">Minutes</SelectItem>
+                <SelectItem value="hours">Hours</SelectItem>
+                <SelectItem value="days">Days</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {nodeType === "merge" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <GitMerge className="w-5 h-5" />
+            <h3 className="font-semibold">Merge Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="merge-mode">Merge Mode</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select merge mode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="append">Append</SelectItem>
+                <SelectItem value="merge">Merge</SelectItem>
+                <SelectItem value="choose-branch">Choose Branch</SelectItem>
+                <SelectItem value="multiplex">Multiplex</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="output-format">Output Format</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select output format" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="array">Array</SelectItem>
+                <SelectItem value="object">Object</SelectItem>
+                <SelectItem value="flatten">Flatten</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {nodeType === "split-batches" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <List className="w-5 h-5" />
+            <h3 className="font-semibold">Split In Batches Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="batch-size">Batch Size</Label>
+            <Input
+              id="batch-size"
+              type="number"
+              placeholder="10"
+              min="1"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="reset">Reset</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select reset option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="never">Never</SelectItem>
+                <SelectItem value="once">Once</SelectItem>
+                <SelectItem value="each">Each Item</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {/* AI AGENTS */}
+      {nodeType === "ai-agent" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Bot className="w-5 h-5" />
+            <h3 className="font-semibold">AI Agent Configuration</h3>
+          </div>
+
+          {/* Model Deployment Type */}
+          <div className="space-y-2">
+            <Label htmlFor="deployment-type">Model Deployment</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select deployment type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cloud">Cloud (API)</SelectItem>
+                <SelectItem value="local">Local/Self-hosted</SelectItem>
+                <SelectItem value="custom">Custom Endpoint</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Model Provider & Type */}
+          <div className="space-y-2">
+            <Label htmlFor="model-provider">Model Provider</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select model provider" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="openai">OpenAI</SelectItem>
+                <SelectItem value="anthropic">Anthropic (Claude)</SelectItem>
+                <SelectItem value="google">Google (Gemini)</SelectItem>
+                <SelectItem value="cohere">Cohere</SelectItem>
+                <SelectItem value="huggingface">Hugging Face</SelectItem>
+                <SelectItem value="ollama">Ollama (Local)</SelectItem>
+                <SelectItem value="llamacpp">LLaMA.cpp</SelectItem>
+                <SelectItem value="localai">LocalAI</SelectItem>
+                <SelectItem value="custom">Custom Model</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Model Name/Version */}
+          <div className="space-y-2">
+            <Label htmlFor="model-name">Model Name</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gpt-4">GPT-4</SelectItem>
+                <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+                <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
+                <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
+                <SelectItem value="claude-3-haiku">Claude 3 Haiku</SelectItem>
+                <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
+                <SelectItem value="gemini-ultra">Gemini Ultra</SelectItem>
+                <SelectItem value="llama-2-70b">LLaMA 2 70B</SelectItem>
+                <SelectItem value="llama-2-13b">LLaMA 2 13B</SelectItem>
+                <SelectItem value="llama-2-7b">LLaMA 2 7B</SelectItem>
+                <SelectItem value="mistral-7b">Mistral 7B</SelectItem>
+                <SelectItem value="codellama">Code Llama</SelectItem>
+                <SelectItem value="custom">Custom Model</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Custom Model Name Input (shown when custom is selected) */}
+          <div className="space-y-2">
+            <Label htmlFor="custom-model">Custom Model Name</Label>
+            <Input
+              id="custom-model"
+              type="text"
+              placeholder="e.g., my-fine-tuned-model, llama2:13b-chat"
+            />
+          </div>
+
+          {/* API Endpoint URL */}
+          <div className="space-y-2">
+            <Label htmlFor="api-endpoint">API Endpoint URL</Label>
+            <Input
+              id="api-endpoint"
+              type="url"
+              placeholder="https://api.openai.com/v1 or http://localhost:11434"
+            />
+          </div>
+
+          {/* API Key */}
+          <div className="space-y-2">
+            <Label htmlFor="api-key" className="flex items-center gap-2">
+              <Key className="w-4 h-4" />
+              API Key / Token
+            </Label>
+            <div className="relative">
+              <Input
+                id="api-key"
+                type="password"
+                placeholder="Enter API key (leave empty for local models)"
+                className="pr-12"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
+              >
+                <EyeOff className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Agent Type */}
+          <div className="space-y-2">
+            <Label htmlFor="agent-type">Agent Type</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select agent type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="conversational">Conversational</SelectItem>
+                <SelectItem value="react">ReAct (Reasoning + Acting)</SelectItem>
+                <SelectItem value="openai-functions">OpenAI Functions</SelectItem>
+                <SelectItem value="structured-chat">Structured Chat</SelectItem>
+                <SelectItem value="zero-shot-react">Zero-shot ReAct</SelectItem>
+                <SelectItem value="self-ask">Self-ask with Search</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* System Message */}
+          <div className="space-y-2">
+            <Label htmlFor="system-message">System Message</Label>
+            <Textarea
+              id="system-message"
+              placeholder="You are a helpful AI assistant specialized in automation workflows. You have access to various tools and can help users accomplish complex tasks."
+              className="h-32"
+            />
+          </div>
+
+          {/* Model Parameters */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="temperature">Temperature</Label>
+              <Input
+                id="temperature"
+                type="number"
+                placeholder="0.7"
+                min="0"
+                max="2"
+                step="0.1"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="max-tokens">Max Tokens</Label>
+              <Input
+                id="max-tokens"
+                type="number"
+                placeholder="4096"
+                min="1"
+                max="32768"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="top-p">Top P</Label>
+              <Input
+                id="top-p"
+                type="number"
+                placeholder="1.0"
+                min="0"
+                max="1"
+                step="0.1"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="frequency-penalty">Frequency Penalty</Label>
+              <Input
+                id="frequency-penalty"
+                type="number"
+                placeholder="0.0"
+                min="-2"
+                max="2"
+                step="0.1"
+              />
+            </div>
+          </div>
+
+          {/* Agent Behavior */}
+          <div className="space-y-2">
+            <Label htmlFor="max-iterations">Max Iterations</Label>
+            <Input
+              id="max-iterations"
+              type="number"
+              placeholder="10"
+              min="1"
+              max="50"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="timeout">Timeout (seconds)</Label>
+            <Input
+              id="timeout"
+              type="number"
+              placeholder="300"
+              min="1"
+              max="3600"
+            />
+          </div>
+
+          {/* Memory Configuration */}
+          <div className="space-y-2">
+            <Label htmlFor="memory-type">Memory Type</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select memory type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No Memory</SelectItem>
+                <SelectItem value="buffer">Conversation Buffer</SelectItem>
+                <SelectItem value="buffer-window">Buffer Window</SelectItem>
+                <SelectItem value="summary">Summary Memory</SelectItem>
+                <SelectItem value="vector">Vector Memory</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="memory-window">Memory Window Size</Label>
+            <Input
+              id="memory-window"
+              type="number"
+              placeholder="10"
+              min="1"
+              max="100"
+            />
+          </div>
+
+          {/* Tools Configuration */}
+          <div className="space-y-2">
+            <Label>Available Tools</Label>
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="web-search" />
+                <Label htmlFor="web-search">Web Search</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="calculator" />
+                <Label htmlFor="calculator">Calculator</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="code-interpreter" />
+                <Label htmlFor="code-interpreter">Code Interpreter</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="file-reader" />
+                <Label htmlFor="file-reader">File Reader</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="email-sender" />
+                <Label htmlFor="email-sender">Email Sender</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="database-query" />
+                <Label htmlFor="database-query">Database Query</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="api-caller" />
+                <Label htmlFor="api-caller">API Caller</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="image-generator" />
+                <Label htmlFor="image-generator">Image Generator</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="text-to-speech" />
+                <Label htmlFor="text-to-speech">Text-to-Speech</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="speech-to-text" />
+                <Label htmlFor="speech-to-text">Speech-to-Text</Label>
+              </div>
+            </div>
+          </div>
+
+          {/* Error Handling */}
+          <div className="space-y-2">
+            <Label htmlFor="error-handling">Error Handling</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select error handling" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="continue">Continue on Error</SelectItem>
+                <SelectItem value="retry">Retry on Error</SelectItem>
+                <SelectItem value="stop">Stop on Error</SelectItem>
+                <SelectItem value="fallback">Use Fallback Response</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="retry-count">Max Retry Count</Label>
+            <Input
+              id="retry-count"
+              type="number"
+              placeholder="3"
+              min="1"
+              max="10"
+            />
+          </div>
+
+          {/* Test Connection Button */}
+          <Button variant="outline" className="w-full">
+            Test Connection
+          </Button>
+        </div>
+      )}
+
+      {nodeType === "gemini" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Brain className="w-5 h-5" />
+            <h3 className="font-semibold">Google Gemini Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="gemini-api-key">API Key</Label>
+            <div className="relative">
+              <Input
+                id="gemini-api-key"
+                type="password"
+                placeholder="Enter Google AI API key"
+                className="pr-12"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
+              >
+                <EyeOff className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="gemini-model">Model</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
+                <SelectItem value="gemini-pro-vision">Gemini Pro Vision</SelectItem>
+                <SelectItem value="gemini-ultra">Gemini Ultra</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="gemini-prompt">Prompt</Label>
+            <Textarea
+              id="gemini-prompt"
+              placeholder="Analyze the following data and provide insights..."
+              className="h-24"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="gemini-temperature">Temperature</Label>
+            <Input
+              id="gemini-temperature"
+              type="number"
+              placeholder="0.7"
+              min="0"
+              max="1"
+              step="0.1"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="max-tokens">Max Output Tokens</Label>
+            <Input
+              id="max-tokens"
+              type="number"
+              placeholder="1024"
+              min="1"
+              max="8192"
+            />
+          </div>
+        </div>
+      )}
+
+      {nodeType === "chatgpt" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <MessageSquare className="w-5 h-5" />
+            <h3 className="font-semibold">ChatGPT Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="openai-api-key">OpenAI API Key</Label>
+            <div className="relative">
+              <Input
+                id="openai-api-key"
+                type="password"
+                placeholder="sk-..."
+                className="pr-12"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
+              >
+                <EyeOff className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="gpt-model">Model</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gpt-4">GPT-4</SelectItem>
+                <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                <SelectItem value="gpt-4-vision-preview">GPT-4 Vision</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="system-prompt">System Prompt</Label>
+            <Textarea
+              id="system-prompt"
+              placeholder="You are a helpful assistant..."
+              className="h-24"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="user-message">User Message</Label>
+            <Textarea
+              id="user-message"
+              placeholder="{{$json.message}}"
+              className="h-24"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="gpt-temperature">Temperature</Label>
+            <Input
+              id="gpt-temperature"
+              type="number"
+              placeholder="0.7"
+              min="0"
+              max="2"
+              step="0.1"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="gpt-max-tokens">Max Tokens</Label>
+            <Input
+              id="gpt-max-tokens"
+              type="number"
+              placeholder="1000"
+              min="1"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ACTIONS */}
+      {nodeType === "gmail" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Mail className="w-5 h-5" />
+            <h3 className="font-semibold">Gmail Configuration</h3>
+          </div>
+          
+          <Button className="w-full" variant="outline">
+            <Link className="w-4 h-4 mr-2" />
+            Connect Gmail Account (OAuth2)
+          </Button>
+
+          <div className="space-y-2">
+            <Label htmlFor="gmail-operation">Operation</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select operation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="send">Send Email</SelectItem>
+                <SelectItem value="get-all">Get All Messages</SelectItem>
+                <SelectItem value="get-message">Get Message</SelectItem>
+                <SelectItem value="search">Search Messages</SelectItem>
+                <SelectItem value="add-label">Add Label</SelectItem>
+                <SelectItem value="remove-label">Remove Label</SelectItem>
+                <SelectItem value="mark-read">Mark as Read</SelectItem>
+                <SelectItem value="mark-unread">Mark as Unread</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="to-email">To</Label>
+            <Input
+              id="to-email"
+              type="email"
+              placeholder="recipient@example.com"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="subject">Subject</Label>
+            <Input
+              id="subject"
+              type="text"
+              placeholder="Email subject"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email-body">Message Body</Label>
+            <Textarea
+              id="email-body"
+              placeholder="Email content..."
+              className="h-32"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email-format">Format</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select format" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="text">Plain Text</SelectItem>
+                <SelectItem value="html">HTML</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="max-results">Max Results</Label>
+            <Input
+              id="max-results"
+              type="number"
+              placeholder="50"
+              min="1"
+              max="500"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="query-filter">Query Filter</Label>
+            <Input
+              id="query-filter"
+              type="text"
+              placeholder="is:unread from:sender@example.com"
+            />
+          </div>
+        </div>
+      )}
+
+      {nodeType === "slack" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <MessageSquare className="w-5 h-5" />
+            <h3 className="font-semibold">Slack Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="slack-token">Bot Token</Label>
+            <div className="relative">
+              <Input
+                id="slack-token"
+                type="password"
+                placeholder="xoxb-..."
+                className="pr-12"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
+              >
+                <EyeOff className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="slack-operation">Operation</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select operation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="post-message">Post Message</SelectItem>
+                <SelectItem value="get-messages">Get Messages</SelectItem>
+                <SelectItem value="update-message">Update Message</SelectItem>
+                <SelectItem value="delete-message">Delete Message</SelectItem>
+                <SelectItem value="get-channels">Get Channels</SelectItem>
+                <SelectItem value="create-channel">Create Channel</SelectItem>
+                <SelectItem value="invite-user">Invite User</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="channel">Channel</Label>
+            <Input
+              id="channel"
+              type="text"
+              placeholder="#general or @username"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="slack-message">Message</Label>
+            <Textarea
+              id="slack-message"
+              placeholder="Hello from your automation!"
+              className="h-24"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="username">Username (Bot Name)</Label>
+            <Input
+              id="username"
+              type="text"
+              placeholder="AutomationBot"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="emoji">Emoji</Label>
+            <Input
+              id="emoji"
+              type="text"
+              placeholder=":robot_face:"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="attachments">Attachments (JSON)</Label>
+            <Textarea
+              id="attachments"
+              placeholder='[{"color": "good", "text": "Success!"}]'
+              className="h-24 font-mono text-sm"
+            />
+          </div>
+        </div>
+      )}
+
+      {nodeType === "telegram" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Send className="w-5 h-5" />
+            <h3 className="font-semibold">Telegram Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="telegram-token">Bot Token</Label>
+            <div className="relative">
+              <Input
+                id="telegram-token"
+                type="password"
+                placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
+                className="pr-12"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
+              >
+                <EyeOff className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="telegram-operation">Operation</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select operation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="send-message">Send Message</SelectItem>
+                <SelectItem value="send-photo">Send Photo</SelectItem>
+                <SelectItem value="send-document">Send Document</SelectItem>
+                <SelectItem value="get-updates">Get Updates</SelectItem>
+                <SelectItem value="get-chat">Get Chat</SelectItem>
+                <SelectItem value="send-location">Send Location</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="chat-id">Chat ID</Label>
+            <Input
+              id="chat-id"
+              type="text"
+              placeholder="@channel_name or 123456789"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="telegram-message">Message</Label>
+            <Textarea
+              id="telegram-message"
+              placeholder="Your message here..."
+              className="h-24"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="parse-mode">Parse Mode</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select parse mode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None</SelectItem>
+                <SelectItem value="markdown">Markdown</SelectItem>
+                <SelectItem value="html">HTML</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="disable-notification">Disable Notification</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="false">No</SelectItem>
+                <SelectItem value="true">Yes</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {nodeType === "code" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Code className="w-5 h-5" />
+            <h3 className="font-semibold">Code Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="code-mode">Mode</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select mode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="runOnceForAllItems">Run Once for All Items</SelectItem>
+                <SelectItem value="runOnceForEachItem">Run Once for Each Item</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="javascript-code">JavaScript Code</Label>
+            <Textarea
+              id="javascript-code"
+              placeholder={`// The first item in the input data
+const firstItem = $input.first();
+
+// Process the data
+const processedData = items.map(item => ({
+  ...item,
+  processed: true,
+  timestamp: new Date().toISOString()
+}));
+
+return processedData;`}
+              className="h-64 font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Available Variables</Label>
+            <div className="text-sm text-muted-foreground space-y-1">
+              <div><code className="bg-surface px-1 rounded">$input</code> - Input data</div>
+              <div><code className="bg-surface px-1 rounded">$json</code> - First item JSON</div>
+              <div><code className="bg-surface px-1 rounded">items</code> - All input items</div>
+              <div><code className="bg-surface px-1 rounded">$workflow</code> - Workflow data</div>
+              <div><code className="bg-surface px-1 rounded">$execution</code> - Execution data</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {nodeType === "set" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Settings className="w-5 h-5" />
+            <h3 className="font-semibold">Set Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="keep-only-set">Keep Only Set Fields</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="false">No</SelectItem>
+                <SelectItem value="true">Yes</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-4">
+            <Label>Values to Set</Label>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-2">
+                <Input placeholder="Field name" />
+                <Input placeholder="Field value" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Input placeholder="status" />
+                <Input placeholder="active" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Input placeholder="timestamp" />
+                <Input placeholder="{{new Date().toISOString()}}" />
+              </div>
+            </div>
+            <Button variant="outline" size="sm">Add Field</Button>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="include-other-fields">Include Other Fields</Label>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder="Select option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Yes</SelectItem>
+                <SelectItem value="false">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {nodeType === "function" && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Zap className="w-5 h-5" />
+            <h3 className="font-semibold">Function Configuration</h3>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="function-name">Function Name</Label>
+            <Input
+              id="function-name"
+              type="text"
+              placeholder="processData"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="function-code">Function Code</Label>
+            <Textarea
+              id="function-code"
+              placeholder={`function processData(input) {
+  // Your transformation logic here
+  return input.map(item => ({
+    ...item,
+    processed: true,
+    processedAt: new Date().toISOString()
+  }));
+}`}
+              className="h-48 font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="function-parameters">Parameters (JSON)</Label>
+            <Textarea
+              id="function-parameters"
+              placeholder='{"param1": "value1", "param2": "{{$json.field}}"}'
+              className="h-24 font-mono text-sm"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* FALLBACK */}
+      {nodeType && !["webhook", "schedule", "email-trigger", "http", "mysql", "google-sheets", "airtable", "google-drive", "if", "switch", "loop", "wait", "merge", "split-batches", "ai-agent", "gemini", "chatgpt", "gmail", "slack", "telegram", "code", "set", "function"].includes(nodeType) && (
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <Label htmlFor="generic-config">Configuration</Label>
+            <Textarea
+              id="generic-config"
+              placeholder="Enter configuration for this node type..."
+              className="h-32"
+            />
+          </div>
+        </div>
+      )}
+
+      <Button className="w-full py-3 font-medium">Save Configuration</Button>
     </div>
   );
 };
