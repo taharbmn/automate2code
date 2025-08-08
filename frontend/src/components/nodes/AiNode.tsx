@@ -49,7 +49,7 @@ export const AiNode = ({ data, isConnectable, selected }: AiNodeProps) => {
   ] : [];
 
   return (
-    <div className="group relative">
+    <div className="group relative ">
       <div className="absolute -left-3 top-0 h-full flex flex-col justify-center">
         <Handle
           key={targetHandle.id}
@@ -70,7 +70,7 @@ export const AiNode = ({ data, isConnectable, selected }: AiNodeProps) => {
 
       <div
         className={`
-        relative min-w-[180px] bg-surface/80 backdrop-blur-sm border rounded-2xl
+        relative min-w-[180px] bg-surface/80 backdrop-blur-sm border rounded-2xl bg-zinc-900
         transition-all duration-200
         ${
           selected

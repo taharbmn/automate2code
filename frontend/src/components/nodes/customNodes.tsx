@@ -71,7 +71,7 @@ export const CustomNode = ({
 
       <div
         className={`
-        relative min-w-[180px] bg-surface/80 backdrop-blur-sm border rounded-2xl
+        relative min-w-[180px] bg-surface/80 backdrop-blur-sm border rounded-2xl bg-zinc-900
         transition-all duration-200
         ${
           selected
