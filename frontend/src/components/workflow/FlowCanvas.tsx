@@ -15,17 +15,27 @@ import '@xyflow/react/dist/style.css';
 import { motion } from 'framer-motion';
 import { CustomNode } from '../nodes/customNodes';
 import Image from 'next/image';
+import ChatInput from './ChatInput';
+import { AiNode } from '../nodes/AiNode';
+import { TriggerNode } from '../nodes/TriggerNode';
 
 const nodeTypes = {
   custom: CustomNode,
+  'ai-agent': AiNode,
+  'gemini': AiNode,
+  'chatgpt': AiNode,
+  'webhook': TriggerNode,
+  'schedule': TriggerNode,
+  'email-trigger': TriggerNode,
+  'trigger': TriggerNode,
 };
 
 interface FlowCanvasProps {
-  nodes: Node[];
   setNodes: Dispatch<SetStateAction<Node[]>>;
+  onNodeSelect?: (node: Node | null) => void;
 }
 
-export const FlowCanvas = ({ nodes: externalNodes, setNodes: setExternalNodes }: FlowCanvasProps) => {
+export const FlowCanvas = ({ setNodes: setExternalNodes, onNodeSelect }: FlowCanvasProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -34,6 +44,17 @@ export const FlowCanvas = ({ nodes: externalNodes, setNodes: setExternalNodes }:
     (params: Connection | Edge) => setEdges((eds: Edge[]) => addEdge(params, eds)),
     [setEdges]
   );
+
+  const onNodeClick = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      onNodeSelect?.(node);
+    },
+    [onNodeSelect]
+  );
+
+  const onPaneClick = useCallback(() => {
+    onNodeSelect?.(null);
+  }, [onNodeSelect]);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -55,13 +76,51 @@ export const FlowCanvas = ({ nodes: externalNodes, setNodes: setExternalNodes }:
         y: event.clientY - 100,
       };
 
+      // Determine node type based on the dragged item
+      const nodeType = ['ai-agent', 'gemini', 'chatgpt'].includes(type) 
+        ? type 
+        : ['webhook', 'schedule', 'email-trigger', 'trigger'].includes(type)
+        ? type
+        : 'custom';
+
+      // Create handles based on node type
+      const getHandles = (nodeType: string) => {
+        if (['ai-agent', 'gemini', 'chatgpt'].includes(nodeType)) {
+          return {
+            sourceHandles: [
+              { id: `${nodeType}-${Date.now()}-source-main`, label: "Output" },
+              { id: `${nodeType}-${Date.now()}-source-response`, label: "Response" }
+            ],
+            targetHandles: [
+              { id: `${nodeType}-${Date.now()}-target-input`, label: "Input" },
+              { id: `${nodeType}-${Date.now()}-target-prompt`, label: "Prompt" }
+            ]
+          };
+        } else if (['webhook', 'schedule', 'email-trigger', 'trigger'].includes(nodeType)) {
+          // Trigger nodes only have source handles (output), no target handles (input)
+          return {
+            sourceHandles: [{ id: `${nodeType}-${Date.now()}-source-main`, label: "Output" }],
+            targetHandles: [] // No input for triggers
+          };
+        } else {
+          return {
+            sourceHandles: [{ id: `${nodeType}-${Date.now()}-source-main`, label: "Output" }],
+            targetHandles: [{ id: `${nodeType}-${Date.now()}-target-main`, label: "Input" }]
+          };
+        }
+      };
+
+      const handles = getHandles(type);
+
       const newNode: Node = {
         id: `${type}-${Date.now()}`,
-        type: 'custom',
+        type: nodeType,
         position,
         data: { 
           nodeType: type,
-          label: getNodeLabel(type)
+          label: getNodeLabel(type),
+          aiModel: ['ai-agent', 'gemini', 'chatgpt'].includes(type) ? type : undefined,
+          ...handles
         },
       };
 
@@ -79,7 +138,14 @@ export const FlowCanvas = ({ nodes: externalNodes, setNodes: setExternalNodes }:
       http: 'HTTP Request',
       transform: 'Transform Data',
       conditional: 'Conditional',
-      output: 'Output'
+      output: 'Output',
+      'ai-agent': 'AI Agent',
+      'gemini': 'Google Gemini',
+      'chatgpt': 'ChatGPT',
+      'webhook': 'Webhook Trigger',
+      'schedule': 'Schedule Trigger',
+      'email-trigger': 'Email Trigger',
+      'trigger': 'Manual Trigger'
     };
     return labels[type as keyof typeof labels] || type;
   };
@@ -100,31 +166,13 @@ export const FlowCanvas = ({ nodes: externalNodes, setNodes: setExternalNodes }:
           onConnect={onConnect}
           onDrop={onDrop}
           onDragOver={onDragOver}
+          onNodeClick={onNodeClick}
+          onPaneClick={onPaneClick}
           nodeTypes={nodeTypes}
           fitView
           attributionPosition="bottom-left"
           className="bg-canvas"
         >
-          {/* <Controls 
-            className="bg-surface border border-border rounded-lg shadow-lg"
-            showInteractive={false}
-          /> */}
-          
-          {/* <MiniMap 
-            className="bg-surface border border-border rounded-lg"
-            nodeColor={(node) => {
-              const colors = {
-                http: '#6366f1',
-                transform: '#f59e0b',
-                conditional: '#10b981',
-                output: '#ec4899'
-              };
-              return colors[node.data?.nodeType as keyof typeof colors] || '#64748b';
-            }}
-            pannable
-            zoomable
-          />
-           */}
           <Background 
             variant={BackgroundVariant.Dots}
             gap={20}
@@ -162,6 +210,7 @@ export const FlowCanvas = ({ nodes: externalNodes, setNodes: setExternalNodes }:
           </div>
         </motion.div>
       )}
+      <ChatInput />
     </motion.div>
   );
 };
