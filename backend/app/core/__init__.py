@@ -1,0 +1,3 @@
+"""
+Core - Central application functionalities
+"""
