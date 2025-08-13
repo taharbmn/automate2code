@@ -51,18 +51,11 @@ const categories = [
     count: 6,
   },
   {
-    id: "ai",
-    name: "AI Agents",
-    description: "Integrate AI models and intelligent processing",
-    icon: Bot,
-    count: 3,
-  },
-  {
     id: "actions",
     name: "Actions",
     description: "Send messages and perform operations",
     icon: Link,
-    count: 6,
+    count: 7,
   },
 ];
 
@@ -151,27 +144,14 @@ const nodeTypes = {
       icon: List,
     },
   ],
-  ai: [
+  ai: [],
+  actions: [
     {
       id: "ai-agent",
       name: "AI Agent",
       description: "AI Agent with Chat Model, Memory, and Tools",
       icon: Bot,
     },
-    {
-      id: "gemini",
-      name: "Google Gemini",
-      description: "Google's Gemini AI model",
-      icon: Brain,
-    },
-    {
-      id: "chatgpt",
-      name: "ChatGPT",
-      description: "OpenAI's ChatGPT model",
-      icon: MessageSquare,
-    },
-  ],
-  actions: [
     {
       id: "gmail",
       name: "Gmail",

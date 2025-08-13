@@ -19,7 +19,6 @@ import {
   User,
   EyeOff,
   Clock,
-  Brain,
   MessageSquare,
   Mail,
   Database,
@@ -54,18 +53,6 @@ const tabs = [
 
 export const Sidebar = ({selectedNode }: {selectedNode?: Node | null}) => {
   const [activeTab, setActiveTab] = useState("code");
-  // const [executionSteps, setExecutionSteps] = useState<ExecutionStep[]>([
-  //   {
-  //     id: "1",
-  //     name: "Initialize Workflow",
-  //     status: "completed",
-  //     timestamp: new Date(),
-  //     duration: 120,
-  //   },
-  //   { id: "2", name: "HTTP Request", status: "running" },
-  //   { id: "3", name: "Transform Data", status: "pending" },
-  //   { id: "4", name: "Output Result", status: "pending" },
-  // ]);
 
   return (
     <div className="w-full h-full flex flex-col bg-surface border-l border-border">
@@ -145,7 +132,7 @@ const PropertiesTab = ({ selectedNode }: PropertiesTabProps) => {
   const [gmailOperation, setGmailOperation] = useState("send");
   const [slackOperation, setSlackOperation] = useState("post-message");
   const [telegramOperation, setTelegramOperation] = useState("send-message");
-
+  const [model, setModel] = useState("gpt-4");
   if (!selectedNode) {
     return (
       <div className="p-6 text-center">
@@ -1722,6 +1709,19 @@ const PropertiesTab = ({ selectedNode }: PropertiesTabProps) => {
       {/* AI AGENTS */}
       {nodeType === "ai-agent" && (
         <div className="space-y-5">
+          <div className=" space-y-2">
+            <Label htmlFor="model">Model</Label>
+            <Select value={model} onValueChange={setModel}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="claude">Claude</SelectItem>
+                <SelectItem value="gpt-3.5">Gemini2.5 pro</SelectItem>
+                <SelectItem value="gpt-4">GPT-4</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="prompt-source">Source for Prompt (User Message)</Label>
             <Select value={promptSource} onValueChange={setPromptSource}>
@@ -1815,163 +1815,6 @@ const PropertiesTab = ({ selectedNode }: PropertiesTabProps) => {
               <Checkbox id="display-note-in-flow" />
               <Label htmlFor="display-note-in-flow">Display Note in Flow?</Label>
             </div>
-          </div>
-        </div>
-      )}
-
-      {nodeType === "gemini" && (
-        <div className="space-y-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Brain className="w-5 h-5" />
-            <h3 className="font-semibold">Google Gemini Configuration</h3>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="gemini-api-key">API Key</Label>
-            <div className="relative">
-              <Input
-                id="gemini-api-key"
-                type="password"
-                placeholder="Enter Google AI API key"
-                className="pr-12"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
-              >
-                <EyeOff className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gemini-model">Model</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select model" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
-                <SelectItem value="gemini-pro-vision">Gemini Pro Vision</SelectItem>
-                <SelectItem value="gemini-ultra">Gemini Ultra</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gemini-prompt">Prompt</Label>
-            <Textarea
-              id="gemini-prompt"
-              placeholder="Analyze the following data and provide insights..."
-              className="h-24"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gemini-temperature">Temperature</Label>
-            <Input
-              id="gemini-temperature"
-              type="number"
-              placeholder="0.7"
-              min="0"
-              max="1"
-              step="0.1"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="max-tokens">Max Output Tokens</Label>
-            <Input
-              id="max-tokens"
-              type="number"
-              placeholder="1024"
-              min="1"
-              max="8192"
-            />
-          </div>
-        </div>
-      )}
-
-      {nodeType === "chatgpt" && (
-        <div className="space-y-5">
-          <div className="flex items-center gap-2 mb-4">
-            <MessageSquare className="w-5 h-5" />
-            <h3 className="font-semibold">ChatGPT Configuration</h3>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="openai-api-key">OpenAI API Key</Label>
-            <div className="relative">
-              <Input
-                id="openai-api-key"
-                type="password"
-                placeholder="sk-..."
-                className="pr-12"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
-              >
-                <EyeOff className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gpt-model">Model</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select model" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="gpt-4">GPT-4</SelectItem>
-                <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
-                <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                <SelectItem value="gpt-4-vision-preview">GPT-4 Vision</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="system-prompt">System Prompt</Label>
-            <Textarea
-              id="system-prompt"
-              placeholder="You are a helpful assistant..."
-              className="h-24"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="user-message">User Message</Label>
-            <Textarea
-              id="user-message"
-              placeholder="{{$json.message}}"
-              className="h-24"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gpt-temperature">Temperature</Label>
-            <Input
-              id="gpt-temperature"
-              type="number"
-              placeholder="0.7"
-              min="0"
-              max="2"
-              step="0.1"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gpt-max-tokens">Max Tokens</Label>
-            <Input
-              id="gpt-max-tokens"
-              type="number"
-              placeholder="1000"
-              min="1"
-            />
           </div>
         </div>
       )}

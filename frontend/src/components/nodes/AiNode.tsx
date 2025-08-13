@@ -45,7 +45,6 @@ export const AiNode = ({ data, isConnectable, selected }: AiNodeProps) => {
   const aiAgentHandles = isAiAgent ? [
     { id: `${data.nodeType}-tools`, label: "Tools" },
     { id: `${data.nodeType}-memory`, label: "Memory" },
-    { id: `${data.nodeType}-model`, label: "Model" }
   ] : [];
 
   return (
