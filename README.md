@@ -6,7 +6,7 @@ Transform your ideas into production-ready AI applications with zero complexity.
 
 WE ARE STILL DEVELOPING THIS PROJECT, IT IS NOT READY YET BUT YOU CAN FOLLOW OUR PROGRESS AND CONTRIBUTE AND CREATE ISSUES AND FEATURE REQUESTS!
 
-![alt text](images/dashboard.png)
+![alt text](images/image.png)
 
 ---
 
