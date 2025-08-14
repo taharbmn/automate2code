@@ -42,7 +42,7 @@ export const TriggerNode = ({ data, isConnectable, selected }: TriggerNodeProps)
     <div className="group relative">
       <div
         className={`
-        relative min-w-[180px] bg-surface/80 backdrop-blur-sm border rounded-2xl
+        relative min-w-[180px] bg-surface/80 backdrop-blur-sm border rounded-2xl bg-zinc-900
         transition-all duration-200
         ${
           selected
@@ -81,7 +81,7 @@ export const TriggerNode = ({ data, isConnectable, selected }: TriggerNodeProps)
         )}
       </div>
 
-      <div className="absolute -right-3 top-0 h-full flex flex-col justify-center">
+      <div className="absolute -right-3 top-0 h-full flex flex-col justify-center ">
         <Handle
           key={sourceHandle.id}
           id={sourceHandle.id}

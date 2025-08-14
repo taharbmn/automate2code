@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { motion, AnimatePresence } from "framer-motion";
+import Editor from "@monaco-editor/react";
 import {
   Settings,
   Code,
@@ -19,7 +20,6 @@ import {
   User,
   EyeOff,
   Clock,
-  Brain,
   MessageSquare,
   Mail,
   Database,
@@ -53,19 +53,7 @@ const tabs = [
 ];
 
 export const Sidebar = ({selectedNode }: {selectedNode?: Node | null}) => {
-  const [activeTab, setActiveTab] = useState("code");
-  // const [executionSteps, setExecutionSteps] = useState<ExecutionStep[]>([
-  //   {
-  //     id: "1",
-  //     name: "Initialize Workflow",
-  //     status: "completed",
-  //     timestamp: new Date(),
-  //     duration: 120,
-  //   },
-  //   { id: "2", name: "HTTP Request", status: "running" },
-  //   { id: "3", name: "Transform Data", status: "pending" },
-  //   { id: "4", name: "Output Result", status: "pending" },
-  // ]);
+  const [activeTab, setActiveTab] = useState("properties");
 
   return (
     <div className="w-full h-full flex flex-col bg-surface border-l border-border">
@@ -120,7 +108,10 @@ export const Sidebar = ({selectedNode }: {selectedNode?: Node | null}) => {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="h-full overflow-y-auto"
           >
-            <PropertiesTab selectedNode={selectedNode} />
+            {activeTab === "properties" && <PropertiesTab selectedNode={selectedNode} />}
+            {activeTab === "execution" && <ExecutionTab selectedNode={selectedNode} />}
+            {activeTab === "code" && <CodeTab selectedNode={selectedNode} />}
+            {activeTab === "settings" && <SettingsTab selectedNode={selectedNode} />}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -145,7 +136,7 @@ const PropertiesTab = ({ selectedNode }: PropertiesTabProps) => {
   const [gmailOperation, setGmailOperation] = useState("send");
   const [slackOperation, setSlackOperation] = useState("post-message");
   const [telegramOperation, setTelegramOperation] = useState("send-message");
-
+  const [model, setModel] = useState("gpt-4");
   if (!selectedNode) {
     return (
       <div className="p-6 text-center">
@@ -1722,6 +1713,19 @@ const PropertiesTab = ({ selectedNode }: PropertiesTabProps) => {
       {/* AI AGENTS */}
       {nodeType === "ai-agent" && (
         <div className="space-y-5">
+          <div className=" space-y-2">
+            <Label htmlFor="model">Model</Label>
+            <Select value={model} onValueChange={setModel}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="claude">Claude</SelectItem>
+                <SelectItem value="gpt-3.5">Gemini2.5 pro</SelectItem>
+                <SelectItem value="gpt-4">GPT-4</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="prompt-source">Source for Prompt (User Message)</Label>
             <Select value={promptSource} onValueChange={setPromptSource}>
@@ -1815,163 +1819,6 @@ const PropertiesTab = ({ selectedNode }: PropertiesTabProps) => {
               <Checkbox id="display-note-in-flow" />
               <Label htmlFor="display-note-in-flow">Display Note in Flow?</Label>
             </div>
-          </div>
-        </div>
-      )}
-
-      {nodeType === "gemini" && (
-        <div className="space-y-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Brain className="w-5 h-5" />
-            <h3 className="font-semibold">Google Gemini Configuration</h3>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="gemini-api-key">API Key</Label>
-            <div className="relative">
-              <Input
-                id="gemini-api-key"
-                type="password"
-                placeholder="Enter Google AI API key"
-                className="pr-12"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
-              >
-                <EyeOff className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gemini-model">Model</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select model" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
-                <SelectItem value="gemini-pro-vision">Gemini Pro Vision</SelectItem>
-                <SelectItem value="gemini-ultra">Gemini Ultra</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gemini-prompt">Prompt</Label>
-            <Textarea
-              id="gemini-prompt"
-              placeholder="Analyze the following data and provide insights..."
-              className="h-24"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gemini-temperature">Temperature</Label>
-            <Input
-              id="gemini-temperature"
-              type="number"
-              placeholder="0.7"
-              min="0"
-              max="1"
-              step="0.1"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="max-tokens">Max Output Tokens</Label>
-            <Input
-              id="max-tokens"
-              type="number"
-              placeholder="1024"
-              min="1"
-              max="8192"
-            />
-          </div>
-        </div>
-      )}
-
-      {nodeType === "chatgpt" && (
-        <div className="space-y-5">
-          <div className="flex items-center gap-2 mb-4">
-            <MessageSquare className="w-5 h-5" />
-            <h3 className="font-semibold">ChatGPT Configuration</h3>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="openai-api-key">OpenAI API Key</Label>
-            <div className="relative">
-              <Input
-                id="openai-api-key"
-                type="password"
-                placeholder="sk-..."
-                className="pr-12"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-surface"
-              >
-                <EyeOff className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gpt-model">Model</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select model" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="gpt-4">GPT-4</SelectItem>
-                <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
-                <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                <SelectItem value="gpt-4-vision-preview">GPT-4 Vision</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="system-prompt">System Prompt</Label>
-            <Textarea
-              id="system-prompt"
-              placeholder="You are a helpful assistant..."
-              className="h-24"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="user-message">User Message</Label>
-            <Textarea
-              id="user-message"
-              placeholder="{{$json.message}}"
-              className="h-24"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gpt-temperature">Temperature</Label>
-            <Input
-              id="gpt-temperature"
-              type="number"
-              placeholder="0.7"
-              min="0"
-              max="2"
-              step="0.1"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="gpt-max-tokens">Max Tokens</Label>
-            <Input
-              id="gpt-max-tokens"
-              type="number"
-              placeholder="1000"
-              min="1"
-            />
           </div>
         </div>
       )}
@@ -2700,6 +2547,329 @@ return processedItem;`
       )}
 
       <Button className="w-full py-3 font-medium">Save Configuration</Button>
+    </div>
+  );
+};
+
+// Execution Tab Component
+const ExecutionTab = ({ selectedNode }: PropertiesTabProps) => {
+  if (!selectedNode) {
+    return (
+      <div className="p-6 text-center">
+        <div className="rounded-full bg-surface/50 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+          <Play className="w-8 h-8 text-muted-foreground" />
+        </div>
+        <h3 className="font-medium text-foreground mb-2">No Node Selected</h3>
+        <p className="text-sm text-muted-foreground">
+          Select a node to view its execution status
+        </p>
+      </div>
+    );
+  }
+
+  const executionStatus = selectedNode.data?.executionStatus || 'idle';
+  const lastExecuted = selectedNode.data?.lastExecuted || null;
+  const executionTime = selectedNode.data?.executionTime || null;
+  const error = selectedNode.data?.error || null;
+
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Play className="w-5 h-5" />
+        <h3 className="font-semibold">Execution Status</h3>
+      </div>
+
+      {/* Current Status */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label>Status</Label>
+          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+            executionStatus === 'running' ? 'bg-yellow-100 text-yellow-800' :
+            executionStatus === 'completed' ? 'bg-green-100 text-green-800' :
+            executionStatus === 'failed' ? 'bg-red-100 text-red-800' :
+            ' bg-neutral-600 text-neutral-100'
+          }`}>
+            {executionStatus === 'running' && '⏳ Running'}
+            {executionStatus === 'completed' && '✅ Completed'}
+            {executionStatus === 'failed' && '❌ Failed'}
+            {executionStatus === 'idle' && '⏸️ Idle'}
+          </div>
+        </div>
+
+        {lastExecuted && (
+          <div className="flex items-center justify-between">
+            <Label>Last Executed</Label>
+            <span className="text-sm text-muted-foreground">
+              {new Date(lastExecuted as string).toLocaleString()}
+            </span>
+          </div>
+        )}
+
+        {executionTime && (
+          <div className="flex items-center justify-between">
+            <Label>Execution Time</Label>
+            <span className="text-sm text-muted-foreground">
+              {String(executionTime)}ms
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="space-y-2">
+          <Label className="text-red-600">Error</Label>
+          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-800 font-mono">{String(error)}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Actions */}
+      <div className="space-y-2">
+        <Label>Quick Actions</Label>
+        <div className="grid grid-cols-2 gap-2">
+          <Button size="sm" variant="outline" className="w-full">
+            <Play className="w-4 h-4 mr-2" />
+            Run Node
+          </Button>
+          <Button size="sm" variant="outline" className="w-full">
+            <Pause className="w-4 h-4 mr-2" />
+            Stop
+          </Button>
+        </div>
+      </div>
+
+      {/* Execution History */}
+      <div className="space-y-2">
+        <Label>Recent Executions</Label>
+        <div className="space-y-2 max-h-40 overflow-y-auto">
+          <div className="text-xs text-muted-foreground p-2 border rounded">
+            No execution history available
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Code Tab Component
+const CodeTab = ({ selectedNode }: PropertiesTabProps) => {
+  // Simple hardcoded workflow code - doesn't change based on nodes
+  const workflowCode = `// Automate2Code - Generated Workflow
+const express = require('express');
+const axios = require('axios');
+const { OpenAI } = require('openai');
+
+const app = express();
+app.use(express.json());
+
+// Initialize OpenAI
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+// Webhook trigger endpoint
+app.post('/webhook/start', async (req, res) => {
+  try {
+    console.log('Workflow triggered:', req.body);
+    
+    // Step 1: Process incoming webhook data
+    const webhookData = req.body;
+    
+    // Step 2: Make HTTP request to external API
+    const apiResponse = await axios.get('https://api.example.com/data', {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY'
+      }
+    });
+    
+    // Step 3: Process with AI
+    const aiPrompt = \`Process this data: \${JSON.stringify(apiResponse.data)}\`;
+    const aiResponse = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system", 
+          content: "You are a data processing assistant."
+        },
+        {
+          role: "user", 
+          content: aiPrompt
+        }
+      ]
+    });
+    
+    // Step 4: Send result via email/webhook
+    const result = {
+      originalData: webhookData,
+      apiData: apiResponse.data,
+      aiProcessed: aiResponse.choices[0].message.content,
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('Workflow completed:', result);
+    res.json({ success: true, result });
+    
+  } catch (error) {
+    console.error('Workflow error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(\`Workflow server running on port \${PORT}\`);
+});
+
+module.exports = app;`;
+
+  return (
+    <div className="p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Code className="w-5 h-5" />
+          <h3 className="font-semibold">Workflow Code</h3>
+        </div>
+        <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(workflowCode)}>
+          Copy Code
+        </Button>
+      </div>
+
+      <div className="border rounded-lg overflow-hidden">
+        <Editor
+          className="h-[80vh]"
+          defaultLanguage="javascript"
+          value={workflowCode}
+          theme="vs-dark"
+          options={{
+            readOnly: true,
+            minimap: { enabled: false },
+            fontSize: 14,
+            lineNumbers: 'on',
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            wordWrap: 'on',
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// Settings Tab Component
+const SettingsTab = ({ selectedNode }: PropertiesTabProps) => {
+  const [workflowName, setWorkflowName] = useState("Untitled Workflow");
+  const [autoSave, setAutoSave] = useState(true);
+  const [darkMode, setDarkMode] = useState(true);
+  const [executionTimeout, setExecutionTimeout] = useState(300);
+
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Settings className="w-5 h-5" />
+        <h3 className="font-semibold">Workflow Settings</h3>
+      </div>
+
+      {/* General Settings */}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="workflow-name">Workflow Name</Label>
+          <Input
+            id="workflow-name"
+            value={workflowName}
+            onChange={(e) => setWorkflowName(e.target.value)}
+            placeholder="Enter workflow name"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="workflow-description">Description</Label>
+          <Textarea
+            id="workflow-description"
+            placeholder="Describe what this workflow does..."
+            className="h-20"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="execution-timeout">Execution Timeout (seconds)</Label>
+          <Input
+            id="execution-timeout"
+            type="number"
+            value={executionTimeout}
+            onChange={(e) => setExecutionTimeout(Number(e.target.value))}
+            min="1"
+            max="3600"
+          />
+        </div>
+      </div>
+
+      {/* Preferences */}
+      <div className="space-y-4">
+        <Label className="text-base font-medium">Preferences</Label>
+        
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="auto-save" 
+            checked={autoSave}
+            onCheckedChange={(checked) => setAutoSave(checked === true)}
+          />
+          <Label htmlFor="auto-save" className="text-sm">
+            Auto-save workflow changes
+          </Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Checkbox 
+            id="dark-mode" 
+            checked={darkMode}
+            onCheckedChange={(checked) => setDarkMode(checked === true)}
+          />
+          <Label htmlFor="dark-mode" className="text-sm">
+            Dark mode
+          </Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Checkbox id="show-grid" defaultChecked />
+          <Label htmlFor="show-grid" className="text-sm">
+            Show grid on canvas
+          </Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Checkbox id="snap-to-grid" defaultChecked />
+          <Label htmlFor="snap-to-grid" className="text-sm">
+            Snap nodes to grid
+          </Label>
+        </div>
+      </div>
+
+      {/* Export/Import */}
+      <div className="space-y-4">
+        <Label className="text-base font-medium">Export/Import</Label>
+        
+        <div className="grid grid-cols-2 gap-2">
+          <Button variant="outline" size="sm">
+            Export JSON
+          </Button>
+          <Button variant="outline" size="sm">
+            Import JSON
+          </Button>
+        </div>
+      </div>
+
+      {/* Save Settings */}
+      <Button className="w-full">
+        Save Settings
+      </Button>
     </div>
   );
 };
